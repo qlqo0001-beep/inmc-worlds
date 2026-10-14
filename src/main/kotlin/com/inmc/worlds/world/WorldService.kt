@@ -219,7 +219,7 @@ class WorldService(private val w: Worlds) {
     fun snapshot(world: World) {
         val entry = w.store.get(world.name) ?: return
         val rules = LinkedHashMap<String, String>()
-        for (rule in rules()) {
+        for (rule in rules(world)) {
             val value = runCatching { world.getGameRuleValue(rule) }.getOrNull() ?: continue
             val default = runCatching { world.getGameRuleDefault(rule) }.getOrNull()
             if (value != default) rules[key(rule)] = value.toString()
@@ -280,6 +280,12 @@ class WorldService(private val w: Worlds) {
     fun rules(): List<GameRule<*>> = runCatching { RegistryAccess.registryAccess().getRegistry(RegistryKey.GAME_RULE).toList() }
         .getOrElse { emptyList() }
         .sortedBy { key(it) }
+
+    /**
+     * 이 월드에서 쓸 수 있는 규칙만 — 레지스트리에는 실험 기능에 묶인 규칙(`max_minecart_speed` 등)도 있고, 그 기능이 꺼진 월드에서
+     * 값을 읽으면 서버가 던진다(2026-10-15 테섭 — 게임 규칙 화면이 안 열림).
+     */
+    fun rules(world: World): List<GameRule<*>> = rules().filter { world.isEnabled(it) }
 
     fun rule(key: String): GameRule<*>? = rules().firstOrNull { key(it) == key }
 

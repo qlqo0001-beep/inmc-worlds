@@ -25,7 +25,7 @@ class GameRulesMenu(w: Worlds, viewer: Player, private val name: String, private
     override fun draw() {
         clear()
         val world = Bukkit.getWorld(name) ?: return WorldListMenu(w, viewer).show()
-        val rules = w.service.rules()
+        val rules = w.service.rules(world)
         page = Paging.clamp(page, rules.size)
         for ((slot, rule) in Paging.slice(rules, page).withIndex()) {
             set(slot, icon(world, rule)) { event -> click(world, rule, event.click) }

@@ -50,6 +50,12 @@ class Verifier(private val w: Worlds) {
                 world.difficulty = original
             }
         },
+        Check("게임 규칙 화면의 규칙을 월드마다 다 읽을 수 있다(실험 기능 규칙 빼기)") { _ ->
+            val broken = Bukkit.getWorlds().flatMap { world ->
+                w.service.rules(world).filter { runCatching { world.getGameRuleValue(it) }.isFailure }.map { "${world.name}:${w.service.key(it)}" }
+            }
+            if (broken.isEmpty()) null else "못 읽음: ${broken.take(5).joinToString()}"
+        },
         Check("다른 길로 바뀐 게임 규칙을 받아 적는다(WorldGameRuleChangeEvent)") { p ->
             val world = p.world
             w.store.quietly {

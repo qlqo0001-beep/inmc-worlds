@@ -54,6 +54,20 @@ class Messages(values: Map<String, String>) : MessageCatalog<Ph>(values, DEFAULT
             "portal-blocked" to "<red>이 월드의 포탈은 막혀 있습니다.</red>",
             "portal-missing" to "<red>이 포탈이 가는 월드가 불러와져 있지 않습니다.</red>",
 
+            // --- 모드 -------------------------------------------------------------------
+            "travel-blocked" to "<red>다른 모드로는 갈 수 없습니다. 모드를 옮기려면 <white>/모드</white></red>",
+            "mode-unknown" to "<red>'{value}' 모드가 없습니다.</red>",
+            "mode-denied" to "<red>'{value}' 모드로 갈 권한이 없습니다.</red>",
+            "mode-here" to "<gray>이미 그 모드에 있습니다.</gray>",
+            "mode-bad-id" to "<red>모드 id 는 영어 소문자·숫자·_·- 만, 32자까지이고 겹치면 안 됩니다.</red>",
+            "mode-created" to "<green>'{value}' 모드를 만들었습니다. 월드를 넣으세요.</green>",
+            "mode-deleted" to "<gold>'{value}' 모드를 지웠습니다.</gold>",
+            "mode-spawn-not-here" to "<red>모드 스폰은 그 모드의 월드에 서서 정하세요.</red>",
+            "player-unknown" to "<red>'{value}' 은(는) 이 서버에 온 적 없는 사람입니다.</red>",
+            "profile-held" to "<yellow>{player} 님이 지금 그 가방을 쓰고 있습니다 — <white>/인벤</white> 으로 보세요.</yellow>",
+            "profile-saved" to "<green>{player} 님의 {value} 가방을 저장했습니다.</green>",
+            "profile-save-failed" to "<red>가방을 저장하지 못했습니다: {value}</red>",
+
             // --- 검증 -------------------------------------------------------------------
             "verify-done" to "<gold>월드 검증</gold> <gray>— 통과 <green>{value}</green> · 실패 <red>{count}</red></gray>",
             "verify-failure" to "<red> ✘ {world}</red> <gray>— {value}</gray>",
@@ -66,6 +80,9 @@ class Messages(values: Map<String, String>) : MessageCatalog<Ph>(values, DEFAULT
                 "<gold>/월드 설정 [월드]</gold> <gray>- 월드 설정(이름·난이도·PVP·스폰·게임 규칙·포탈)</gray>",
                 "<gold>/월드 이동 (월드)</gold> <gray>- 그 월드의 스폰으로</gray>",
                 "<gold>/월드 검증</gold> <gray>- 서버 안 자동 검사</gray>",
+                "<gold>/모드</gold> <gray>- 모드 고르기 · </gray><gold>/모드 (모드)</gold> <gray>- 그 모드로</gray>",
+                "<gold>/모드 관리</gold> <gray>- 모드·월드·스폰·채팅/탭 묶음·기능 토글</gray>",
+                "<gold>/모드 가방 (사람) (모드)</gold> <gray>- 다른 모드의 가방 보기·고치기</gray>",
             ).joinToString("\n"),
         )
     }

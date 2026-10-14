@@ -10,6 +10,7 @@ authors: [ INMC ]
 dependencies:
   server:
     inmc-core:        { load: BEFORE, required: true,  join-classpath: true }
+    PlaceholderAPI:   { load: OMIT,   required: false, join-classpath: true }
     inmc-essentials:  { load: AFTER,  required: false }
     inmc-dungeon:     { load: AFTER,  required: false }
     inmc-menu:        { load: AFTER,  required: false }
@@ -22,5 +23,9 @@ dependencies:
 
 permissions:
   inmcworlds.admin:
-    description: 월드·모드 관리 전체 (만들기·불러오기·지우기·설정·게임 규칙·포탈 연결·검증)
+    description: 월드·모드 관리 전체 (만들기·불러오기·지우기·설정·게임 규칙·포탈 연결·모드·기능 토글·검증)
     default: op
+  inmcworlds.bypass.travel:
+    description: 모드가 다른 곳으로 아무 이동(TPA·워프·/tp)으로나 갈 수 있다 — 넘으면 몸이 바뀐다
+    default: op
+# 모드마다 inmcworlds.mode.<id> — 선언하지 않는다(기본 허용). 막으려면 LuckPerms 에서 false 로.

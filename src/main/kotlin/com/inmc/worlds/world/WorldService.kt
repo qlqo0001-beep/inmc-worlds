@@ -186,9 +186,12 @@ class WorldService(private val w: Worlds) {
     /** 관리자 이동(목록의 우클릭·`/월드 이동`) — core `Realms.travel`(모드가 있으면 모드 공급처가 몸을 바꾼다). */
     fun travel(player: org.bukkit.entity.Player, to: Location) = kr.inmc.core.integration.Realms.travel(player, to)
 
+    /** 안의 사람을 그 사람 모드의 스폰으로(그 스폰이 이 월드면 본 월드 스폰). 모드를 넘어도 된다 — 몸은 바뀐 월드 사건이 맞춘다. */
     private fun evacuate(world: World) {
-        val out = main.spawnLocation
-        for (player in world.players.toList()) player.teleport(out)
+        for (player in world.players.toList()) {
+            val target = w.realm.spawn(w.realm.modeAt(player)).takeIf { it.world != world } ?: main.spawnLocation
+            w.realm.moveNow(player, target)
+        }
     }
 
     // --- 플러그인 값이 이긴다 ----------------------------------------------------------------------

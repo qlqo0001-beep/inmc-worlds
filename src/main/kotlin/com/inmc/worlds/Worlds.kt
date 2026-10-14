@@ -1,6 +1,9 @@
 package com.inmc.worlds
 
 import com.inmc.worlds.config.Messages
+import com.inmc.worlds.mode.ModeService
+import com.inmc.worlds.mode.ModeStore
+import com.inmc.worlds.mode.TabSync
 import com.inmc.worlds.util.Ph
 import com.inmc.worlds.world.WorldService
 import com.inmc.worlds.world.WorldStore
@@ -31,6 +34,14 @@ class Worlds(override val plugin: JavaPlugin) : InmcHost {
     val store = WorldStore(this)
 
     val service = WorldService(this)
+
+    /** 모드들 · 빌려 쓰는 월드 · 기능 토글(`modes.yml`). */
+    val modes = ModeStore(this)
+
+    /** 사람의 모드 · 몸 맞추기 · 모드를 넘는 이동. */
+    val realm = ModeService(this)
+
+    val tabs = TabSync()
 
     /** 리로드 때 — 버려질 상태를 계속 고치지 않게 열린 우리 화면을 닫는다. */
     fun closeMenus() {

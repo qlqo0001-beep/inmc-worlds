@@ -19,6 +19,8 @@ class Draft(
     var entry: WorldEntry = WorldEntry(name = "", flat = Flat()),
     /** 보이는 이름(MiniMessage) — 만든 뒤 타이틀포지 별칭으로. */
     var display: String = "",
+    /** 넣을 모드. null = 이 월드만의 새 모드(사용자 결정 2026-10-15 — 기본은 자기 모드). */
+    var mode: String? = null,
 )
 
 /**
@@ -83,6 +85,17 @@ class CreateWizard(w: Worlds, viewer: Player, private val draft: Draft = Draft()
             }
         }
 
+        set(33, Icon.of(Material.COMPASS, "<yellow>모드: </yellow>" + (draft.mode?.let { w.modes.get(it)?.name } ?: "<white>새 모드(이 월드만)</white>"), listOf(
+            "<gray>기본은 이 월드만의 모드 — 가방·장비가 다른 모드와 따로입니다.</gray>", "", "<gray>클릭해서 고르기</gray>",
+        ))) {
+            val options = listOf<String?>(null) + w.modes.all().map { it.id }
+            PickMenu(w, viewer, "<dark_green>넣을 모드</dark_green>", options,
+                icon = { id -> if (id == null) Icon.of(Material.LIME_DYE, "<white>새 모드(이 월드만)</white>", emptyList())
+                    else w.modes.get(id)!!.let { m -> Icon.of(m.icon, m.name, listOf("<dark_gray>${m.id}</dark_gray>")) } },
+                back = { show() },
+            ) { id -> draft.mode = id; show() }.show()
+        }
+
         fillEmpty(Icon.FILLER)
         set(SLOT_CREATE, Icon.of(Material.EMERALD_BLOCK, "<green>✔ 만들기</green>", listOf(
             "<gray>만드는 동안 서버가 잠깐 멈춥니다(스폰 둘레를 만듭니다).</gray>",
@@ -118,6 +131,7 @@ class CreateWizard(w: Worlds, viewer: Player, private val draft: Draft = Draft()
         if (e.name.isEmpty()) return w.messages.send(viewer, "create-no-name")
         val draftNow = e
         val display = draft.display
+        val mode = draft.mode
         viewer.closeInventory()
         w.messages.send(viewer, "world-creating", Ph.of().world(draftNow.name))
         // 메시지가 먼저 보이게 한 틱 뒤에.
@@ -129,6 +143,7 @@ class CreateWizard(w: Worlds, viewer: Player, private val draft: Draft = Draft()
                 }
                 is WorldService.Created.Ok -> {
                     if (display.isNotEmpty()) PlaceNames.setWorld(result.world.name, display)
+                    if (mode != null) w.modes.assign(result.world.name, mode)
                     w.messages.send(viewer, "world-created", Ph.of().world(result.world.name))
                     WorldSettingsMenu(w, viewer, result.world.name).show()
                 }

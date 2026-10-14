@@ -35,6 +35,6 @@ class ResourceTest {
     @Test
     fun `코드가 쓰는 권한은 전부 선언돼 있다`() {
         val yml = File("src/main/resources/paper-plugin.yml").readText()
-        for (node in listOf(Worlds.ADMIN)) assertTrue(Regex("""(?m)^  ${Regex.escape(node)}:""").containsMatchIn(yml), node)
+        for (node in listOf(Worlds.ADMIN, com.inmc.worlds.mode.RealmsProvider.BYPASS)) assertTrue(Regex("""(?m)^  ${Regex.escape(node)}:""").containsMatchIn(yml), node)
     }
 }

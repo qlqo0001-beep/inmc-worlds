@@ -9,3 +9,7 @@ inmc {
     paper = "26.2"
     pluginName = "inmc-worlds"
 }
+
+dependencies {
+    compileOnly(libs.placeholderapi) { isTransitive = false }
+}

@@ -88,6 +88,51 @@ class Verifier(private val w: Worlds) {
                 }
             }
         },
+        Check("모드 공급처가 꽂혀 있고 몸 부분이 기능 목록에 있다(core Realms)") { _ ->
+            val keys = kr.inmc.core.integration.Realms.features().map { it.key }.toSet()
+            val missing = com.inmc.worlds.body.Part.entries.filter { it.key !in keys }
+            when {
+                !kr.inmc.core.integration.Realms.available -> "Realms 공급처 없음"
+                missing.isNotEmpty() -> "기능 목록에 없음: ${missing.joinToString { it.key }}"
+                else -> null
+            }
+        },
+        Check("불러온 월드는 모두 모드에 들거나 빌려 쓰는 월드") { _ ->
+            val loose = Bukkit.getWorlds().map { it.name }.filter { name ->
+                !w.modes.isBorrowed(name) && w.modes.all().none { m -> m.worlds.any { it.equals(name, true) } }
+            }
+            if (loose.isEmpty()) null else "모드 없음: ${loose.joinToString()}"
+        },
+        Check("내 모드 = 서 있는 월드의 모드, 몸 표식 = 원하는 칸") { p ->
+            val at = w.realm.modeAt(p)
+            val held = com.inmc.worlds.body.BukkitBody.parseHeldOf(p)
+            val want = w.realm.desired(at)
+            when {
+                w.realm.of(p.uniqueId) != at -> "Realms.of = ${w.realm.of(p.uniqueId)} ≠ $at"
+                w.realm.bodyMode(p) != at -> "몸의 모드 = ${w.realm.bodyMode(p)} ≠ $at"
+                held == null -> "몸 표식 없음"
+                want.any { (part, scope) -> held[part] != scope } -> "몸 표식 $held ≠ 원하는 $want"
+                else -> null
+            }
+        },
+        Check("권한 없는 사람의 다른 모드로 가는 순간이동은 막힌다(진짜 사건)") { p ->
+            val here = w.realm.modeAt(p)
+            val other = Bukkit.getWorlds().firstOrNull { world -> w.modes.modeOfWorld(world.name)?.let { it != here } == true }
+                ?: return@Check null // 다른 모드의 월드가 불러와져 있지 않으면 볼 것이 없다
+            val attachment = p.addAttachment(w.plugin, com.inmc.worlds.mode.RealmsProvider.BYPASS, false)
+            try {
+                val event = org.bukkit.event.player.PlayerTeleportEvent(p, p.location.clone(), other.spawnLocation, TeleportCause.PLUGIN)
+                event.callEvent()
+                if (!event.isCancelled) "다른 모드(${other.name})로 가는 순간이동이 통과함" else null
+            } finally {
+                p.removeAttachment(attachment)
+            }
+        },
+        Check("탭 목록이 탭 묶음대로(투명이 아닌 사람끼리)") { _ ->
+            val online = Bukkit.getOnlinePlayers().filter { !kr.inmc.core.integration.Vanish.isVanished(it) }
+            val wrong = online.flatMap { a -> online.filter { b -> a != b && a.canSee(b) && a.isListed(b) != kr.inmc.core.integration.Realms.sameTab(a, b) }.map { b -> "${a.name}→${b.name}" } }
+            if (wrong.isEmpty()) null else "어긋남: ${wrong.take(5).joinToString()}"
+        },
     )
 
     fun run(player: Player) {

@@ -56,6 +56,10 @@ class Verifier(private val w: Worlds) {
             }
             if (broken.isEmpty()) null else "못 읽음: ${broken.take(5).joinToString()}"
         },
+        Check("게임 규칙마다 한국어 설명이 있다(서버를 올려 새로 생긴 규칙 알림)") { _ ->
+            val missing = w.service.rules().map { w.service.key(it) }.filter { it !in com.inmc.worlds.gui.GameRuleTexts.descriptions }
+            if (missing.isEmpty()) null else "GameRuleTexts 에 없음(바닐라 설명이 쓰임): ${missing.take(5).joinToString()}"
+        },
         Check("다른 길로 바뀐 게임 규칙을 받아 적는다(WorldGameRuleChangeEvent)") { p ->
             val world = p.world
             w.store.quietly {

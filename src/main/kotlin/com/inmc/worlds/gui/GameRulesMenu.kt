@@ -50,9 +50,14 @@ class GameRulesMenu(w: Worlds, viewer: Player, private val name: String, private
         }
         val shown = if (bool) Icon.toggle(value == true) else "<white>$value</white>"
         val color = if (changed) "gold" else "yellow"
-        Icon.of(material, "<$color><lang:$key></$color>", listOfNotNull(
-            "<gray><lang_or:$key.description:'-'></gray>",
-            "<dark_gray>${w.service.key(rule)}</dark_gray>",
+        val id = w.service.key(rule)
+        // 우리 표(위키로 확인한 설명) → 없으면 클라이언트 번역의 설명 → 그것도 없으면 '-'.
+        val description = GameRuleTexts.descriptions[id]?.map { "<gray>$it</gray>" } ?: listOf("<gray><lang_or:$key.description:'-'></gray>")
+        // 인벤키퍼는 죽음을 직접 처리하고(event.keepInventory = true) 켤 때마다 이 규칙을 끈다 — 여기서 바꿔도 소용없다.
+        val note = if (id == "minecraft:keep_inventory" && Bukkit.getPluginManager().isPluginEnabled("inmc-invkeeper"))
+            listOf("<gold>인벤키퍼가 죽음을 처리해 이 규칙은 쓰이지 않습니다</gold>", "<gold>(인벤키퍼가 켤 때마다 끕니다).</gold>") else emptyList()
+        Icon.of(material, "<$color>${GameRuleTexts.names[id] ?: "<lang:$key>"}</$color>", description + note + listOfNotNull(
+            "<dark_gray>$id</dark_gray>",
             "",
             "<gray>지금: </gray>$shown <gray>· 기본: <white>${if (bool) (if (default == true) "켜짐" else "꺼짐") else default}</white></gray>",
             if (changed) "<gold>기본값과 다릅니다 — 켤 때마다 이 값으로 덮어씁니다.</gold>" else null,

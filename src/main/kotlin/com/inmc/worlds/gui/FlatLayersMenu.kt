@@ -6,6 +6,7 @@ import com.inmc.worlds.world.Flat
 import com.inmc.worlds.world.FlatJson
 import com.inmc.worlds.world.Layer
 import kr.inmc.core.gui.DialogForm
+import kr.inmc.core.gui.Editors
 import kr.inmc.core.gui.Icon
 import kr.inmc.core.gui.ItemInputMenu
 import kr.inmc.core.gui.Paging
@@ -82,9 +83,9 @@ class FlatLayersMenu(w: Worlds, viewer: Player, private val draft: Draft, privat
             }
             set(13, Icon.of(Material.LADDER, "<yellow>높이: </yellow><white>${layer.height}</white>", listOf(
                 "<gray>좌클릭 +1 · 우클릭 −1 · Shift 와 함께 ±10</gray>",
-                "<gray>Q(버리기 키): 직접 입력</gray>",
+                "<gray>숫자키(1~9)·Q: 직접 입력</gray>",
             ))) { event ->
-                if (event.click == ClickType.DROP || event.click == ClickType.CONTROL_DROP) {
+                if (Editors.isPrompt(event) || event.click == ClickType.CONTROL_DROP) {
                     ask(DialogForm("층 높이").long("height", "높이", layer.height.toLong(), 1, FlatJson.MAX_THICKNESS.toLong())) { v ->
                         v.long("height")?.let { setHeight(it.toInt()) }
                     }
@@ -141,9 +142,9 @@ class QuickFlatMenu(w: Worlds, viewer: Player, private val draft: Draft, private
         set(14, blockIcon("겉 블록", top)) { pick("겉 블록") { top = it } }
         set(16, Icon.of(Material.LADDER, "<yellow>두께: </yellow><white>$height</white>", listOf(
             "<gray>바닥부터 겉까지의 칸 수.</gray>",
-            "<gray>좌클릭 +1 · 우클릭 −1 · Shift 와 함께 ±10 · Q: 직접 입력</gray>",
+            "<gray>좌클릭 +1 · 우클릭 −1 · Shift 와 함께 ±10 · 숫자키(1~9)·Q: 직접 입력</gray>",
         ))) { event ->
-            if (event.click == ClickType.DROP || event.click == ClickType.CONTROL_DROP) {
+            if (Editors.isPrompt(event) || event.click == ClickType.CONTROL_DROP) {
                 ask(DialogForm("평지 두께").long("height", "두께", height.toLong(), 1, FlatJson.MAX_THICKNESS.toLong())) { v ->
                     v.long("height")?.let { height = it.toInt() }
                 }
